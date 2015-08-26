@@ -1,4 +1,4 @@
-package dottedprogress;
+package doext.dottedprogress;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

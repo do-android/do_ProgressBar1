@@ -24,10 +24,10 @@ import core.object.DoUIModule;
 import core.object.DoInvokeResult;
 import doext.define.do_ProgressBar1_IMethod;
 import doext.define.do_ProgressBar1_MAbstract;
-import dottedprogress.DottedProgressBar;
-import dottedprogress.DottedProgressEntity;
-import dottedprogress.ScaleDotProgressBar;
-import dottedprogress.ScaleDotProgressEntity;
+import doext.dottedprogress.DottedProgressBar;
+import doext.dottedprogress.DottedProgressEntity;
+import doext.dottedprogress.ScaleDotProgressBar;
+import doext.dottedprogress.ScaleDotProgressEntity;
 
 /**
  * 自定义扩展UIView组件实现类，此类必须继承相应VIEW类，并实现DoIUIModuleView,do_ProgressBar1_IMethod接口；

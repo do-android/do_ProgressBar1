@@ -1,4 +1,4 @@
-package dottedprogress;
+package doext.dottedprogress;
 
 import android.content.Context;
 import android.graphics.Bitmap;
