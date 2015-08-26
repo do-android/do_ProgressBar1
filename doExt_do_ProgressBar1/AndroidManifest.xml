@@ -6,7 +6,8 @@
     deviceone:versionName="1.0" >
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+	<uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
     <uses-sdk
         deviceone:minSdkVersion="8"
         deviceone:targetSdkVersion="19" />
@@ -19,7 +20,7 @@
         deviceone:name="dotest.module.frame.debug.DoApplication">
         <!-- WebViewSampleTestActivty替换为您测试组件Activity -->
         <activity
-            deviceone:name="dotest.module.activity.WebViewSampleTestActivty"
+            deviceone:name="dotest.module.activity.DoTestActivity"
             deviceone:label="@string/app_name" >
             <intent-filter>
                 <action deviceone:name="android.intent.action.MAIN" />

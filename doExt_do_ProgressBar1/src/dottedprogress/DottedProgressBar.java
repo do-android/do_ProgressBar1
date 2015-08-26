@@ -1,24 +1,20 @@
 package dottedprogress;
 
-import java.math.BigDecimal;
-
 import android.content.Context;
-import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.view.View;
 
 /**
  * Created by igortrncic on 6/18/15.
  */
 public class DottedProgressBar extends View {
-
-	private float mDotSize;
+    private float mDotSize;
     private float mSpacing;
     private int mJumpingSpeed;
     private int mEmptyDotsColor;
@@ -36,11 +32,9 @@ public class DottedProgressBar extends View {
     private Paint mPaint;
     private int mPaddingLeft;
     private Handler mHandler;
-    private double[] arrZooms;
     private Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
-        	updateZoomData(mActiveDotIndex, mNumberOfDots);
             if (mNumberOfDots != 0)
                 mActiveDotIndex = (mActiveDotIndex + 1) % mNumberOfDots;
             DottedProgressBar.this.invalidate();
@@ -48,83 +42,44 @@ public class DottedProgressBar extends View {
         }
     };
 
-	public DottedProgressBar(Context context) {
-		super(context);
-	}
+
     public DottedProgressBar(Context context, AttributeSet attrs) {
         super(context, attrs);
+    }
 
-//        TypedArray a = context.getTheme().obtainStyledAttributes(
-//                attrs,
-//                R.styleable.DottedProgressBar,
-//                0, 0);
-//
-//        isInProgress = false;
-//        mHandler = new Handler();
-//
-//        try {
-////            mEmptyDotsColor = a.getColor(R.styleable.DottedProgressBar_emptyDotsColor, Color.WHITE);
-////            mActiveDotColor = a.getColor(R.styleable.DottedProgressBar_activeDotColor, Color.BLUE);
-//
-//            TypedValue value = new TypedValue();
-//
-//            a.getValue(R.styleable.DottedProgressBar_activeDot, value);
-//            if (value.type >= TypedValue.TYPE_FIRST_COLOR_INT && value.type <= TypedValue.TYPE_LAST_COLOR_INT) {
-//                // It's a color
-//                isActiveDrawable = false;
-//                mActiveDotColor = getResources().getColor(value.resourceId);
-//            } else if (value.type == TypedValue.TYPE_STRING) {
-//                // It's a reference, hopefully to a drawable
-//                isActiveDrawable = true;
-//                mActiveDot = getResources().getDrawable(value.resourceId);
-//            }
-//
-//            a.getValue(R.styleable.DottedProgressBar_inactiveDot, value);
-//            if (value.type >= TypedValue.TYPE_FIRST_COLOR_INT && value.type <= TypedValue.TYPE_LAST_COLOR_INT) {
-//                // It's a color
-//                isInactiveDrawable = false;
-//                mEmptyDotsColor = getResources().getColor(value.resourceId);
-//            } else if (value.type == TypedValue.TYPE_STRING) {
-//                // It's a reference, hopefully to a drawable
-//                isInactiveDrawable = true;
-//                mInactiveDot = getResources().getDrawable(value.resourceId);
-//            }
-//
-//            mDotSize = a.getDimensionPixelSize(R.styleable.DottedProgressBar_dotSize, 5);
-//            mSpacing = a.getDimensionPixelSize(R.styleable.DottedProgressBar_spacing, 10);
-//
-//            mActiveDotIndex = a.getInteger(R.styleable.DottedProgressBar_activeDotIndex, 0);
-//
-//            mJumpingSpeed = a.getInt(R.styleable.DottedProgressBar_jumpingSpeed, 500);
-//
-//            mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-//            mPaint.setStyle(Paint.Style.FILL);
-//        } finally {
-//            a.recycle();
-//        }
-   }
+    public DottedProgressBar(Context mContext,DottedProgressEntity entity) {
+		super(mContext);
+		 isInProgress = false;
+         mHandler = new Handler();
+         isActiveDrawable = true;
+         isInactiveDrawable = true;
+         mInactiveDot = new BitmapDrawable(entity.getDefaultImage());
+         mActiveDot = new BitmapDrawable(entity.getChangeImage());
+         mNumberOfDots = entity.getPointNum();
+         mSpacing = 0;
+         mActiveDotIndex = 0;
+         mJumpingSpeed = 500;
+         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+         mPaint.setStyle(Paint.Style.FILL);
+	}
 
-    @Override
+	@Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-       
+
         for (int i = 0; i < mNumberOfDots; i++) {
-        	double _zoom = arrZooms[i];
             int x = (int) (getPaddingLeft() + mPaddingLeft + mSpacing / 2 + i * (mSpacing + mDotSize));
             if (isInactiveDrawable) {
-            	mInactiveDot.setBounds(x, getPaddingTop(), (int) (x + mDotSize), getPaddingTop() + (int) mDotSize);
-               // mInactiveDot.setBounds((int)(x*_zoom), (int)(getPaddingTop()*_zoom), (int) ((x + mDotSize)*_zoom), (int)((getPaddingTop() + (int) mDotSize)*_zoom));
-                mInactiveDot.draw(canvas);
+                mInactiveDot.setBounds(x, getPaddingTop(), (int) (x + mDotSize), getPaddingTop() + (int) mDotSize);
+               // mInactiveDot.setBounds(0, getPaddingTop(), (int) (x + mDotSize), getPaddingTop() + (int) mDotSize);
+            	mInactiveDot.draw(canvas);
             } else {
                 mPaint.setColor(mEmptyDotsColor);
                 canvas.drawCircle(x + mDotSize / 2,
-                        getPaddingTop() + mDotSize / 2, (int)((mDotSize / 2)*_zoom), mPaint);
-//                canvas.drawCircle((int)((x + mDotSize / 2)*_zoom),
-//                        (int)(getPaddingTop()*_zoom) + (int)((mDotSize / 2)*_zoom), (int)((mDotSize / 2)*_zoom), mPaint);
+                        getPaddingTop() + mDotSize / 2, mDotSize / 2, mPaint);
             }
         }
         if (isInProgress) {
-        	
             int x = (int) (getPaddingLeft() + mPaddingLeft + mSpacing / 2 + mActiveDotIndex * (mSpacing + mDotSize));
             if (isActiveDrawable) {
                 mActiveDot.setBounds(x, getPaddingTop(), (int) (x + mDotSize), getPaddingTop() + (int) mDotSize);
@@ -141,26 +96,31 @@ public class DottedProgressBar extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
         int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
-
-        int widthWithoutPadding = parentWidth - getPaddingLeft() - getPaddingRight();
-        int heigthWithoutPadding = parentHeight - getPaddingTop() - getPaddingBottom();
-
-        //setMeasuredDimension(parentWidth, calculatedHeight);
-
-        int calculatedHeight = getPaddingTop() + getPaddingBottom() + (int) mDotSize;
+       
+        mDotSize = parentHeight<parentWidth?parentHeight:parentWidth;
+        
+        //计算最多显示几个小球
+        int maxCountOfDots = getDotRealSize(parentWidth,parentHeight);
+        mNumberOfDots = Math.min(mNumberOfDots, maxCountOfDots);
+        
+        int calculatedHeight = (int) mDotSize;
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        this.setMeasuredDimension(parentWidth, calculatedHeight);
-        mNumberOfDots = calculateDotsNumber(widthWithoutPadding);
+        this.setMeasuredDimension((int)((mDotSize+mSpacing)*mNumberOfDots), calculatedHeight);
     }
 
-    private int calculateDotsNumber(int width) {
-        int number = (int) (width / (mDotSize + mSpacing));
-        mPaddingLeft = (int) ((width % (mDotSize + mSpacing)) / 2);
-        //setPadding(getPaddingLeft() + (int) mPaddingLeft, getPaddingTop(), getPaddingRight() + (int) mPaddingLeft, getPaddingBottom());
-        return number;
-    }
 
-    public void startProgress() {
+
+    private int getDotRealSize(int parentWidth, int parentHeight) {
+    	int maxLength= Math.max(parentWidth, parentHeight);
+    	float cellsize= mDotSize+mSpacing;
+    	if(cellsize<=0){
+    		return 0;
+    	}else{
+    		return (int) Math.ceil((maxLength *1.0) / cellsize);
+    	}
+	}
+
+	public void startProgress() {
         isInProgress = true;
         mActiveDotIndex = -1;
         mHandler.removeCallbacks(mRunnable);
@@ -172,25 +132,27 @@ public class DottedProgressBar extends View {
         mHandler.removeCallbacks(mRunnable);
         invalidate();
     }
-    private  void updateZoomData(int current,int totleNums){
-    	double baseZoom = 0.85;
-    	arrZooms = new double [totleNums];
-    	if(current<0||totleNums<1){
-    		baseZoom = 1;
-    	}
-    	for(int i=0;i<arrZooms.length;i++){
-    		if(i==current){
-    			arrZooms [i] = 1.00;
-    		}else if(i>current){
-    			double scral = Math.pow(baseZoom, (i - current)+1);
-    			BigDecimal   b   =   new   BigDecimal(scral);  
-    			arrZooms [i]   =   b.setScale(2,   BigDecimal.ROUND_HALF_UP).doubleValue();  
-    		}else if(i<current){
-    			double scral = Math.pow(baseZoom, (current - i)+1);
-    			BigDecimal   b   =   new   BigDecimal(scral);  
-    			arrZooms [i]   =   b.setScale(2,   BigDecimal.ROUND_HALF_UP).doubleValue();  
-    		}
-    	}
+    public void setPointNum(int count){
+    	mNumberOfDots = count;
+    }
+    public void setDefaultImage(Bitmap bitmap){
+    	mInactiveDot = new BitmapDrawable(bitmap);
+    	invalidate();
+    }
+    public void setChangeImage(Bitmap bitmap){
+    	mActiveDot = new BitmapDrawable(bitmap);
+    	invalidate();
     	
     }
+    public void destroy(){
+    	if(mActiveDot!=null){
+    		mActiveDot.setCallback(null);
+    		mActiveDot = null;
+    	}
+    	if(mInactiveDot!=null){
+    		mInactiveDot.setCallback(null);
+    		mInactiveDot = null;
+    	}
+    }
+
 }

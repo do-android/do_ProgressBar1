@@ -29,6 +29,19 @@
         android:layout_below="@+id/header"
         android:background="@drawable/red"
         android:orientation="vertical" >
+        <LinearLayout
+            android:id="@+id/ll"
+            android:layout_width="400px"
+            android:layout_height="60px"
+            android:background="#ffffff"
+            android:orientation="vertical" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="setPro"
+            android:text="测试更改属性"
+            />
+
     </LinearLayout>
 
     <LinearLayout

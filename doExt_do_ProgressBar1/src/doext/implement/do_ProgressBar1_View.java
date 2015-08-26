@@ -1,16 +1,33 @@
 package doext.implement;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+
 import android.content.Context;
-import android.view.View;
+import android.graphics.Bitmap;
+import android.text.TextUtils;
+import android.view.Gravity;
+import android.widget.FrameLayout;
+import core.DoServiceContainer;
+import core.helper.DoIOHelper;
+import core.helper.DoImageLoadHelper;
+import core.helper.DoTextHelper;
 import core.helper.DoUIModuleHelper;
+
 import org.json.JSONObject;
+
 import core.interfaces.DoIUIModuleView;
 import core.interfaces.DoIScriptEngine;
+import core.object.DoProperty;
 import core.object.DoUIModule;
 import core.object.DoInvokeResult;
 import doext.define.do_ProgressBar1_IMethod;
 import doext.define.do_ProgressBar1_MAbstract;
+import dottedprogress.DottedProgressBar;
+import dottedprogress.DottedProgressEntity;
+import dottedprogress.ScaleDotProgressBar;
+import dottedprogress.ScaleDotProgressEntity;
 
 /**
  * 自定义扩展UIView组件实现类，此类必须继承相应VIEW类，并实现DoIUIModuleView,do_ProgressBar1_IMethod接口；
@@ -19,16 +36,20 @@ import doext.define.do_ProgressBar1_MAbstract;
  * 参数解释：@_messageName字符串事件名称，@jsonResult传递事件参数对象；
  * 获取DoInvokeResult对象方式new DoInvokeResult(this.model.getUniqueKey());
  */
-public class do_ProgressBar1_View extends View implements DoIUIModuleView,do_ProgressBar1_IMethod{
+public class do_ProgressBar1_View extends FrameLayout implements DoIUIModuleView,do_ProgressBar1_IMethod{
 	
 	/**
 	 * 每个UIview都会引用一个具体的model实例；
 	 */
 	private do_ProgressBar1_MAbstract model;
+	private Context mContext;
+	private DottedProgressBar dottedProgressBar;
+	private ScaleDotProgressBar scaleDotProgressBar;
+	private String mStyle;
 	
-
 	public do_ProgressBar1_View(Context context) {
 		super(context);
+		this.mContext = context;
 	}
 	
 	/**
@@ -36,16 +57,70 @@ public class do_ProgressBar1_View extends View implements DoIUIModuleView,do_Pro
 	 */
 	@Override
 	public void loadView(DoUIModule _doUIModule) throws Exception {
-		this.model = (do_ProgressBar1_MAbstract)_doUIModule;
-		//...do something
+		this.model = (do_ProgressBar1_MAbstract) _doUIModule;
+
+		DoProperty _propertyStyle = model.getProperty("style");
+		mStyle = _propertyStyle.getValue();
+
+		DoProperty _propertyPointNum = model.getProperty("pointNum");
+		int _pointNum = DoTextHelper.strToInt(_propertyPointNum.getValue(), 0);
+		//普通样式
+		if (!TextUtils.isEmpty(mStyle) && mStyle.equals("normal")) {
+
+			DoProperty _propertyDefaultImage = model.getProperty("defaultImage");
+			String _defaultImage = _propertyDefaultImage.getValue();
+
+			DoProperty _propertyChangeImage = model.getProperty("changeImage");
+			String _changeImage = _propertyChangeImage.getValue();
+
+			DottedProgressEntity entity = new DottedProgressEntity(_pointNum, getLocalBitmap(_defaultImage), getLocalBitmap(_changeImage));
+			dottedProgressBar = new DottedProgressBar(mContext, entity);
+			//设置居中显示
+			FrameLayout.LayoutParams fParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+			fParams.gravity = Gravity.CENTER_HORIZONTAL;
+			fParams.topMargin = 0;
+			fParams.bottomMargin = 0;
+			dottedProgressBar.setLayoutParams(fParams);
+			this.addView(dottedProgressBar);
+			
+			dottedProgressBar.startProgress();
+		//循环样式
+		}else if(!TextUtils.isEmpty(mStyle) && mStyle.equals("zoom")){
+			DoProperty _propertyChangeImage = model.getProperty("pointColors");
+			String _colors = _propertyChangeImage.getValue();
+			List<Integer> colors = getColors(_colors);
+			ScaleDotProgressEntity entity = new ScaleDotProgressEntity(_pointNum, colors);
+			scaleDotProgressBar = new ScaleDotProgressBar(mContext, entity);
+			FrameLayout.LayoutParams fParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+			fParams.gravity = Gravity.CENTER_HORIZONTAL;
+			fParams.topMargin = 0;
+			fParams.bottomMargin = 0;
+			this.addView(scaleDotProgressBar, fParams);
+			scaleDotProgressBar.startProgress();
+		}else{
+			throw new Exception("do_ProgressBar1 style 异常");
+		}
+		
+		
 	}
 	
+	private List<Integer> getColors(String _colors) {
+		List<Integer> list = new ArrayList<Integer>();
+		String arrColors[] = _colors.split(",");
+		for(int i=0;i<arrColors.length;i++){
+			int color = DoUIModuleHelper.getColorFromString(arrColors[i], 0x000000ff);
+			list.add(color);
+		}
+		return list;
+	}
+
 	/**
 	 * 动态修改属性值时会被调用，方法返回值为true表示赋值有效，并执行onPropertiesChanged，否则不进行赋值；
 	 * @_changedValues<key,value>属性集（key名称、value值）；
 	 */
 	@Override
 	public boolean onPropertiesChanging(Map<String, String> _changedValues) {
+		
 		return true;
 	}
 	
@@ -56,7 +131,29 @@ public class do_ProgressBar1_View extends View implements DoIUIModuleView,do_Pro
 	@Override
 	public void onPropertiesChanged(Map<String, String> _changedValues) {
 		DoUIModuleHelper.handleBasicViewProperChanged(this.model, _changedValues);
-		//...do something
+		
+		if (_changedValues.containsKey("changeImage")) {
+			String _changeImage = _changedValues.get("changeImage");
+			if(dottedProgressBar!=null)
+			dottedProgressBar.setChangeImage(getLocalBitmap(_changeImage));
+		}
+		if (_changedValues.containsKey("defaultImage")) {
+			String _defaultImage = _changedValues.get("defaultImage");
+			if(dottedProgressBar!=null)
+			dottedProgressBar.setDefaultImage(getLocalBitmap(_defaultImage));
+		}
+		
+		if (_changedValues.containsKey("pointNum")) {
+			int pointNum = DoTextHelper.strToInt(_changedValues.get("pointNum"), 0);
+			if(dottedProgressBar!=null)
+			dottedProgressBar.setPointNum(pointNum);
+		}
+		if (_changedValues.containsKey("pointColors")) {
+			String pointColors = _changedValues.get("pointColors");
+			List<Integer> colors = getColors(pointColors);
+			if(scaleDotProgressBar!=null)
+			scaleDotProgressBar.setColors(colors);
+		}
 	}
 	
 	/**
@@ -98,6 +195,14 @@ public class do_ProgressBar1_View extends View implements DoIUIModuleView,do_Pro
 	@Override
 	public void onDispose() {
 		//...do something
+		if(dottedProgressBar!=null){
+			dottedProgressBar.destroy();
+			dottedProgressBar = null;
+		}
+		if(scaleDotProgressBar!=null){
+			scaleDotProgressBar.destroy();
+			scaleDotProgressBar = null;
+		}
 	}
 	
 	/**
@@ -115,6 +220,21 @@ public class do_ProgressBar1_View extends View implements DoIUIModuleView,do_Pro
 	@Override
 	public DoUIModule getModel() {
 		return model;
+	}
+	
+	private Bitmap getLocalBitmap(String local) {
+		Bitmap bitmap = null;
+		try {
+			if (null == DoIOHelper.getHttpUrlPath(local) && local != null && !"".equals(local)) {
+				String path = DoIOHelper.getLocalFileFullPath(this.model.getCurrentPage().getCurrentApp(), local);
+				bitmap = DoImageLoadHelper.getInstance().loadLocal(path, -1, -1);
+			} else {
+				throw new Exception("只支持本地图片");
+			}
+		} catch (Exception e) {
+			DoServiceContainer.getLogEngine().writeError("do_ProgressBar1 无法获取图片", e);
+		}
+		return bitmap;
 	}
 
 }
