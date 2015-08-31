@@ -61,7 +61,9 @@ public class do_ProgressBar1_View extends FrameLayout implements DoIUIModuleView
 
 		DoProperty _propertyStyle = model.getProperty("style");
 		mStyle = _propertyStyle.getValue();
-
+		if(mStyle ==null || mStyle.equals("")){
+			mStyle = "normal";
+		}
 		DoProperty _propertyPointNum = model.getProperty("pointNum");
 		int _pointNum = DoTextHelper.strToInt(_propertyPointNum.getValue(), 0);
 		//普通样式
