@@ -147,8 +147,12 @@ public class do_ProgressBar1_View extends FrameLayout implements DoIUIModuleView
 		
 		if (_changedValues.containsKey("pointNum")) {
 			int pointNum = DoTextHelper.strToInt(_changedValues.get("pointNum"), 0);
-			if(dottedProgressBar!=null)
-			dottedProgressBar.setPointNum(pointNum);
+			if(dottedProgressBar!=null){
+				dottedProgressBar.setPointNum(pointNum);
+			}else if(scaleDotProgressBar!=null){
+				scaleDotProgressBar.setPointNum(pointNum);
+			}
+			
 		}
 		if (_changedValues.containsKey("pointColors")) {
 			String pointColors = _changedValues.get("pointColors");

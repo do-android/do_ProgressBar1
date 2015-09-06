@@ -168,5 +168,10 @@ public class ScaleDotProgressBar extends View {
 			colors.clear();
 		}
 	}
+	public void setPointNum(int num){
+		mNumberOfDots = num;
+		this.invalidate();
+	}
+	
 
 }
