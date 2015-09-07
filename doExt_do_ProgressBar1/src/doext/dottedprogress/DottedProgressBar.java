@@ -47,7 +47,7 @@ public class DottedProgressBar extends View {
         super(context, attrs);
     }
 
-    public DottedProgressBar(Context mContext,DottedProgressEntity entity) {
+	public DottedProgressBar(Context mContext,DottedProgressEntity entity) {
 		super(mContext);
 		 isInProgress = false;
          mHandler = new Handler();
@@ -66,12 +66,10 @@ public class DottedProgressBar extends View {
 	@Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
         for (int i = 0; i < mNumberOfDots; i++) {
             int x = (int) (getPaddingLeft() + mPaddingLeft + mSpacing / 2 + i * (mSpacing + mDotSize));
             if (isInactiveDrawable) {
                 mInactiveDot.setBounds(x, getPaddingTop(), (int) (x + mDotSize), getPaddingTop() + (int) mDotSize);
-               // mInactiveDot.setBounds(0, getPaddingTop(), (int) (x + mDotSize), getPaddingTop() + (int) mDotSize);
             	mInactiveDot.draw(canvas);
             } else {
                 mPaint.setColor(mEmptyDotsColor);
@@ -134,6 +132,7 @@ public class DottedProgressBar extends View {
     }
     public void setPointNum(int count){
     	mNumberOfDots = count;
+    	requestLayout();
     }
     public void setDefaultImage(Bitmap bitmap){
     	mInactiveDot = new BitmapDrawable(bitmap);

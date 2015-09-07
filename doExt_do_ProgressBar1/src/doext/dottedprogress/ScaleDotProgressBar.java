@@ -83,6 +83,7 @@ public class ScaleDotProgressBar extends View {
 		
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 		this.setMeasuredDimension((int)(mDotSize*mNumberOfDots), calculatedHeight);
+		startProgress();
 	}
 
 	private int getDotRealSize(int parentWidth, int parentHeight) {
@@ -96,9 +97,11 @@ public class ScaleDotProgressBar extends View {
 	}
 
 	public void startProgress() {
-		maxPointIndex = -1;
-		mHandler.removeCallbacks(mRunnable);
-		mHandler.post(mRunnable);
+		if(mNumberOfDots>0){
+			maxPointIndex = -1;
+			mHandler.removeCallbacks(mRunnable);
+			mHandler.post(mRunnable);
+		}
 	}
 
 	public void stopProgress() {
@@ -170,7 +173,7 @@ public class ScaleDotProgressBar extends View {
 	}
 	public void setPointNum(int num){
 		mNumberOfDots = num;
-		this.invalidate();
+		requestLayout();
 	}
 	
 

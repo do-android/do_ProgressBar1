@@ -74,7 +74,6 @@ public class do_ProgressBar1_View extends FrameLayout implements DoIUIModuleView
 
 			DoProperty _propertyChangeImage = model.getProperty("changeImage");
 			String _changeImage = _propertyChangeImage.getValue();
-
 			DottedProgressEntity entity = new DottedProgressEntity(_pointNum, getLocalBitmap(_defaultImage), getLocalBitmap(_changeImage));
 			dottedProgressBar = new DottedProgressBar(mContext, entity);
 			//设置居中显示
@@ -98,7 +97,6 @@ public class do_ProgressBar1_View extends FrameLayout implements DoIUIModuleView
 			fParams.topMargin = 0;
 			fParams.bottomMargin = 0;
 			this.addView(scaleDotProgressBar, fParams);
-			scaleDotProgressBar.startProgress();
 		}else{
 			throw new Exception("do_ProgressBar1 style 异常");
 		}
@@ -136,8 +134,13 @@ public class do_ProgressBar1_View extends FrameLayout implements DoIUIModuleView
 		
 		if (_changedValues.containsKey("changeImage")) {
 			String _changeImage = _changedValues.get("changeImage");
-			if(dottedProgressBar!=null)
-			dottedProgressBar.setChangeImage(getLocalBitmap(_changeImage));
+			if(dottedProgressBar!=null){
+				Bitmap localBitmap = getLocalBitmap(_changeImage);
+				if(localBitmap!=null)
+				dottedProgressBar.setChangeImage(localBitmap);
+			}
+				
+			
 		}
 		if (_changedValues.containsKey("defaultImage")) {
 			String _defaultImage = _changedValues.get("defaultImage");
